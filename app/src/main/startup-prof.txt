@@ -1,0 +1,39 @@
+# ==============================================================================
+# Luma (com.lord67.luma) — ART Startup Profile (HRF)
+# Strictly scoped to cold-start path (MainActivity -> Theme -> Preferences ->
+# LibraryScreen first frame) so AGP packs startup classes into primary classes.dex
+# while keeping Study Notebook & heavy engines strictly lazy in secondary DEX.
+# ==============================================================================
+
+# Activity Launch & Edge-to-Edge First Frame
+HSPLcom/example/MainActivity;->onCreate(Landroid/os/Bundle;)V
+HSPLcom/example/MainActivity;->onStart()V
+HSPLcom/example/MainActivity;->onResume()V
+PLcom/example/MainActivity$**;->**(**)**
+Lcom/example/MainActivity;
+Lcom/example/MainActivity$**;
+
+# Theme & Palette Resolution
+HSPLcom/example/ui/theme/ThemeKt**;->**(**)**
+HSPLcom/example/ui/theme/FolioPalette**;->**(**)**
+Lcom/example/ui/theme/ThemeKt;
+Lcom/example/ui/theme/FolioPalette;
+
+# Fast Preferences & Room Opening
+HSPLcom/example/data/local/PreferencesRepository**;->**(**)**
+HSPLcom/example/data/local/FolioDatabase**;->**(**)**
+HSPLcom/example/data/local/FolioDao**;->**(**)**
+HSPLcom/example/data/local/FolioRepository**;->**(**)**
+Lcom/example/data/local/PreferencesRepository;
+Lcom/example/data/local/FolioDatabase;
+
+# First-Frame Library UI & Fast Thumbnail Cache
+HSPLcom/example/ui/library/LibraryViewModel**;->**(**)**
+HSPLcom/example/ui/library/LibraryScreenKt**;->**(**)**
+HSPLcom/example/ui/library/LibraryCardsKt**;->**(**)**
+HSPLcom/example/ui/library/CoverBitmapCache**;->**(**)**
+HSPLcom/example/engine/BitmapDecodeUtils**;->**(**)**
+HSPLcom/example/engine/MemoryPressureManager**;->**(**)**
+HSPLcom/example/engine/DisplayRefreshRateController**;->**(**)**
+Lcom/example/ui/library/LibraryViewModel;
+Lcom/example/ui/library/CoverBitmapCache;

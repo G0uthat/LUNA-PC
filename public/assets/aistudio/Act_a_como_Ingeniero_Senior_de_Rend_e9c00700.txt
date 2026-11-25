@@ -1,0 +1,32 @@
+Actúa como Ingeniero Senior de Rendimiento Android (Kotlin, Jetpack Compose, Room, Coroutines)
+con experiencia en apps de lectura con renderizado intensivo. Tienes acceso al proyecto completo
+de "LUNA" (com.lord67.luma): lector de EPUB/PDF/DOCX/PPTX/TXT/FB2, offline-first, con P2P,
+OCR (ML Kit), traducción, dibujo sobre páginas y "Dynamic Island" propia.
+
+OBJETIVO: dejar la app lo más rápida, fluida y ligera posible, sin romper funcionalidades ni
+cambiar el diseño visual. Meta: arranque en frío < 1 s, scroll y paginación a 60/120 fps sin
+jank, y uso de memoria bajo.
+
+REGLAS
+- No elimines funciones ni cambies el aspecto salvo donde te lo indique explícitamente.
+- Mide antes y después: explica la causa y el efecto esperado de cada cambio.
+- Trabaja por fases, compilando entre fases. No hagas refactors gigantes de una vez.
+- Marca como [SEGURO] los cambios sin riesgo y como [RIESGO] los que puedan alterar el
+  comportamiento. Para estos últimos, dame primero el plan y espera mi confirmación.
+- No toques los bloques marcados "Do not remove or modify" en build.gradle.kts (signingConfigs).
+
+FASE 1 — BUILD Y EMPAQUETADO (mayor impacto, bajo riesgo)
+1. Activa en release: isMinifyEnabled = true, isShrinkResources = true y
+   proguard-android-optimize.txt. Escribe las reglas keep necesarias en proguard-rules.pro para:
+   Room, PDFBox-android (com.tom_roush), ML Kit, Lottie, Jsoup, OkHttp, las clases
+   serializadas por JSONObject/JsonConverters, y el NotificationListenerService.
+   Verifica que no se rompa nada por reflexión.
+2. Añade un Baseline Profile y un módulo macrobenchmark (arranque en frío, scroll de la
+   biblioteca, cambio de página del lector). Añade androidx.profileinstaller.
+3. Revisa las dependencias: quita las no usadas, evalúa alternativas más ligeras a
+   pdfbox-android (solo se usa para extraer texto y exportar PDF) y confirma que ML Kit
+   Translate se descargue bajo demanda. Habilita splits por ABI o App Bundle. Reduce y convierte
+   a WebP los drawables grandes (img_guide_*.jpg, iconos). Revisa que las 9 fuentes en res/font
+   solo se carguen cuando se necesitan.
+4. Fija la versión de Compose y confirma que Strong Skipping Mode esté activo (Kotlin 2.0.20+).
+   Genera los compiler reports de Compose (stability) y úsalos en la Fase 3.

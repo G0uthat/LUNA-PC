@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/luma_splash_blue</item>
+    </style>
+
+    <style name="Theme.Luma.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/luma_splash_blue</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_luma</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/luma_splash_blue</item>
+        <item name="android:statusBarColor">@color/luma_splash_blue</item>
+        <item name="android:navigationBarColor">@color/luma_splash_blue</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyApplication</item>
+    </style>
+</resources>

@@ -1,0 +1,10 @@
+{
+  "latestVersion": "1.0",
+  "latestVersionCode": 1,
+  "minRequiredVersion": "1.0",
+  "minRequiredVersionCode": 1,
+  "forceUpdate": false,
+  "apkUrl": "",
+  "releaseNotes": "Versión inicial de Luma con lector universal (EPUB, PDF, DOCX, PPTX, TXT, FB2), temas suaves, brillo absoluto e Isla Dinámica.",
+  "blockMessage": "Esta versión de Luma ya no es compatible. Actualiza al APK más reciente desde GitHub para continuar."
+}

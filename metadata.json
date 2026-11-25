@@ -1,0 +1,6 @@
+{
+  "name": "Luma",
+  "description": "Biblioteca visual de lectura, manhwa con OCR y traducción integrada, playlists de sagas, temas suaves y anotaciones exportables.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Luma</string>
+    <string name="library_title">Mi Biblioteca</string>
+    <string name="library_subtitle">Lectura minimalista, OCR y estudio local</string>
+    <string name="continue_reading">Continuar leyendo</string>
+    <string name="import_document">Importar</string>
+    <string name="search_library_hint">Buscar por título o autor…</string>
+    <string name="filter_all">Todos</string>
+    <string name="empty_library_title">Tu biblioteca está lista</string>
+    <string name="empty_library_subtitle">Importa archivos EPUB, PDF, Manhwas, DOCX, TXT o FB2 para comenzar.</string>
+    <string name="bookmark_dock_cd">Abrir menú marcapáginas</string>
+    <string name="bookmark_dock_close_cd">Cerrar menú marcapáginas</string>
+    <string name="tool_appearance">Texto y Tema</string>
+    <string name="tool_toc">Índice</string>
+    <string name="tool_draw">Dibujar</string>
+    <string name="tool_ocr_translate">OCR y Traducir</string>
+    <string name="tool_annotations">Notas y Marcadores</string>
+    <string name="tool_search">Buscar</string>
+    <string name="tool_dictionary_ai">Diccionario e IA</string>
+    <string name="tool_export">Exportar fusionado</string>
+    <string name="tool_back_library">Biblioteca</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_sepia">Sepia</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_amoled">AMOLED</string>
+    <string name="export_success">Documento exportado con dibujos y texto seleccionable</string>
+    <string name="export_in_progress">Fusionando dibujos y texto seleccionable…</string>
+    <string name="ocr_scanning">Escaneando texto OCR…</string>
+    <string name="translating_page">Traduciendo página…</string>
+</resources>

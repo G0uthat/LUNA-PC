@@ -1,0 +1,74 @@
+# ==============================================================================
+# Luma (com.lord67.luma) — Curated ART Baseline Profile (HRF)
+# Compiled into assets/dexopt/baseline.prof by AGP and installed on-device via
+# androidx.profileinstaller for AOT compilation of cold start, library scroll,
+# and reader page-turning hot paths.
+# Regenerate on a physical API 33+ device or GMD with `:benchmark` BaselineProfileGenerator.
+# ==============================================================================
+
+# Cold Startup & Application Entry
+HSPLcom/example/MainActivity;->onCreate(Landroid/os/Bundle;)V
+HSPLcom/example/MainActivity;->onResume()V
+PLcom/example/MainActivity$**;->**(**)**
+Lcom/example/MainActivity;
+Lcom/example/MainActivity$**;
+
+# Theme, Dynamic Refresh-Rate Motion & Lazy Typography
+HSPLcom/example/ui/theme/**;->**(**)**
+Lcom/example/ui/theme/**;
+
+# Local Persistence (Room + DataStore Preferences)
+HSPLcom/example/data/local/FolioDatabase**;->**(**)**
+HSPLcom/example/data/local/FolioDao**;->**(**)**
+HSPLcom/example/data/local/FolioRepository**;->**(**)**
+HSPLcom/example/data/local/PreferencesRepository**;->**(**)**
+HSPLcom/example/data/local/JsonConverters**;->**(**)**
+Lcom/example/data/local/**;
+Lcom/example/data/model/**;
+
+# Library Screen & ViewModel (First Frame + Vertical Scroll)
+HSPLcom/example/ui/library/LibraryViewModel**;->**(**)**
+HSPLcom/example/ui/library/LibraryScreenKt**;->**(**)**
+Lcom/example/ui/library/**;
+
+# Reader Screen, ViewModel, Reflow/Standard/PDF Pagers (Page Turns)
+HSPLcom/example/ui/reader/ReaderViewModel**;->**(**)**
+HSPLcom/example/ui/reader/ReaderScreenKt**;->**(**)**
+HSPLcom/example/ui/reader/StandardPageDocumentReaderKt**;->**(**)**
+HSPLcom/example/ui/reader/PdfManhwaReaderKt**;->**(**)**
+Lcom/example/ui/reader/**;
+
+# Core UI Components & Lottie Animations
+HSPLcom/example/ui/components/TactileDesignKt**;->**(**)**
+HSPLcom/example/ui/components/LumaLottieAnimationsKt**;->**(**)**
+HSPLcom/example/ui/components/ProfileMenuCapsuleKt**;->**(**)**
+HSPLcom/example/ui/components/DynamicIslandEventBannerKt**;->**(**)**
+Lcom/example/ui/components/**;
+
+# Core Engines Invoked on Launch, Caching, Import & Reading
+HSPLcom/example/engine/DisplayRefreshRateController**;->**(**)**
+HSPLcom/example/engine/DocumentParser**;->**(**)**
+HSPLcom/example/engine/ParsedDocumentDiskCache**;->**(**)**
+HSPLcom/example/engine/PdfPageDiskCache**;->**(**)**
+HSPLcom/example/engine/LumaDiskCacheManager**;->**(**)**
+HSPLcom/example/engine/CoverManager**;->**(**)**
+HSPLcom/example/engine/BitmapDecodeUtils**;->**(**)**
+HSPLcom/example/engine/ExternalFileInspector**;->**(**)**
+HSPLcom/example/engine/DynamicIslandEventManager**;->**(**)**
+HSPLcom/example/engine/SystemMediaController**;->**(**)**
+HSPLcom/example/engine/GitHubUpdateManager**;->**(**)**
+Lcom/example/engine/DisplayRefreshRateController;
+Lcom/example/engine/DocumentParser;
+Lcom/example/engine/ParsedDocumentDiskCache;
+Lcom/example/engine/PdfPageDiskCache;
+Lcom/example/engine/LumaDiskCacheManager;
+Lcom/example/engine/CoverManager;
+
+# Study Notebook Hot Paths (AOT-compiled for smooth 60/120fps drawing while still lazy-loaded)
+HSPLcom/example/notebook/render/NotebookCanvasRenderer**;->**(**)**
+HSPLcom/example/notebook/ui/NotebookScreenKt**;->**(**)**
+HSPLcom/example/notebook/ui/NotebookViewModel**;->**(**)**
+HSPLcom/example/notebook/data/NotebookRepository**;->**(**)**
+HSPLcom/example/notebook/data/NotebookJsonCodec**;->**(**)**
+Lcom/example/notebook/render/**;
+Lcom/example/notebook/model/**;

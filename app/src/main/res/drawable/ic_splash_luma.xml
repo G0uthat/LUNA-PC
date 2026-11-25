@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="192dp"
+        android:height="192dp"
+        android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="#15253F" />
+        </shape>
+    </item>
+    <item
+        android:width="116dp"
+        android:height="116dp"
+        android:drawable="@drawable/img_luma_icon_1795111004144"
+        android:gravity="center" />
+</layer-list>

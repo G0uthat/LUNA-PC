@@ -1,0 +1,32 @@
+Actúa como Ingeniero Senior de Rendimiento Android (Kotlin, Jetpack Compose, Room, Coroutines)
+con experiencia en apps de lectura con renderizado intensivo. Tienes acceso al proyecto completo
+de "LUNA" (com.lord67.luma): lector de EPUB/PDF/DOCX/PPTX/TXT/FB2, offline-first, con P2P,
+OCR (ML Kit), traducción, dibujo sobre páginas y "Dynamic Island" propia.
+
+OBJETIVO: dejar la app lo más rápida, fluida y ligera posible, sin romper funcionalidades ni
+cambiar el diseño visual. Meta: arranque en frío < 1 s, scroll y paginación a 60/120 fps sin
+jank, y uso de memoria bajo.
+
+REGLAS
+- No elimines funciones ni cambies el aspecto salvo donde te lo indique explícitamente.
+- Mide antes y después: explica la causa y el efecto esperado de cada cambio.
+- Trabaja por fases, compilando entre fases. No hagas refactors gigantes de una vez.
+- Marca como [SEGURO] los cambios sin riesgo y como [RIESGO] los que puedan alterar el
+  comportamiento. Para estos últimos, dame primero el plan y espera mi confirmación.
+- No toques los bloques marcados "Do not remove or modify" en build.gradle.kts (signingConfigs).
+
+FASE 2 — ARRANQUE EN FRÍO (MainActivity y capa de datos)
+1. MainActivity.onCreate hace trabajo síncrono: FolioDatabase.getInstance, PreferencesRepository,
+   SystemMediaController.start, DynamicIslandEventManager.start y DisplayRefreshRateController.
+   Mueve a hilos de fondo o inicialización diferida todo lo que no sea imprescindible para el
+   primer frame. Usa SplashScreen API y androidx.startup si conviene.
+2. LibraryViewModel.init ejecuta ensureDefaultDictionarySources, ensureSampleDocuments y
+   ensureAllCoversExist en viewModelScope (Dispatchers.Main por defecto). Confirma que el
+   trabajo pesado corra en Dispatchers.IO/Default y que la UI no espere al seeding.
+3. Room: añade índices a las columnas de ORDER BY y WHERE (lastOpenedAt en documents, etc.).
+   Evita SELECT * cuando solo se necesiten columnas concretas (listado de la biblioteca sin
+   synopsis ni campos pesados; usa proyecciones). Quita `fallbackToDestructiveMigration
+   (dropAllTables = true)` y escribe migraciones reales (hoy una subida de versión borra la
+   biblioteca del usuario). Activa exportSchema y WAL.
+4. DataStore: evita releer/reescribir ReaderPreferences completo para cambios pequeños, y
+   debounce de los sliders (brillo, tamaño de fuente, márgenes) para no escribir en cada tick.

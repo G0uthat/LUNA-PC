@@ -1,0 +1,38 @@
+Actúa como Ingeniero Senior de Rendimiento Android (Kotlin, Jetpack Compose, Room, Coroutines)
+con experiencia en apps de lectura con renderizado intensivo. Tienes acceso al proyecto completo
+de "LUNA" (com.lord67.luma): lector de EPUB/PDF/DOCX/PPTX/TXT/FB2, offline-first, con P2P,
+OCR (ML Kit), traducción, dibujo sobre páginas y "Dynamic Island" propia.
+
+OBJETIVO: dejar la app lo más rápida, fluida y ligera posible, sin romper funcionalidades ni
+cambiar el diseño visual. Meta: arranque en frío < 1 s, scroll y paginación a 60/120 fps sin
+jank, y uso de memoria bajo.
+
+REGLAS
+- No elimines funciones ni cambies el aspecto salvo donde te lo indique explícitamente.
+- Mide antes y después: explica la causa y el efecto esperado de cada cambio.
+- Trabaja por fases, compilando entre fases. No hagas refactors gigantes de una vez.
+- Marca como [SEGURO] los cambios sin riesgo y como [RIESGO] los que puedan alterar el
+  comportamiento. Para estos últimos, dame primero el plan y espera mi confirmación.
+- No toques los bloques marcados "Do not remove or modify" en build.gradle.kts (signingConfigs).
+
+FASE 4 — LECTOR (la parte más crítica)
+1. FluidPaginator.paginate: debe ejecutarse en Dispatchers.Default, ser cancelable, incremental
+   (paginar primero el capítulo actual y el resto en segundo plano) y con caché invalidada solo
+   cuando cambien tipografía o viewport. Estima alturas con TextMeasurer cacheado, no con layouts
+   repetidos.
+2. DocumentParser: no cargues XHTML ni ZIP completos con readText/readBytes. Usa streaming,
+   parsea capítulos de forma perezosa (solo el abierto + vecinos) y cachea el resultado
+   parseado en disco para reaperturas instantáneas. Confirma que Jsoup no parsee de más.
+3. PdfManhwaReader/PdfRenderer: renderiza solo la página visible ± 1, con tamaño acorde a la
+   pantalla (no a la resolución del PDF), con LruCache por bytes y reciclado, cancelando los
+   renders de páginas que salen de pantalla. Reutiliza el PdfRenderer abierto y sincroniza su
+   acceso (solo permite una página abierta a la vez). Evita ARGB_8888 donde RGB_565 baste.
+4. Bitmaps (LibraryScreen, AccountHubSheet, StandardPageDocumentReader, CoverManager,
+   MergedDocumentExporter, PeerSyncEngine): todo decodeFile/decodeStream/decodeByteArray debe
+   usar inJustDecodeBounds + inSampleSize al tamaño real de destino y correr en IO. Evalúa
+   cargar miniaturas de portada ya reducidas y guardadas en disco, y ImageDecoder en API 28+.
+5. OCR (OcrEngine/ML Kit): ejecútalo bajo demanda, con una sola tarea a la vez, y cachea
+   resultados en ocr_page_cache. Nunca debe correr durante el scroll.
+6. DrawingCanvasOverlay: evita recomponer por cada punto del trazo. Usa Path acumulado,
+   dibuja en drawBehind y persiste al terminar el trazo, no durante él.
+7. Diccionario/traducción contextual: debounce, cancelación del lookup anterior y caché en memoria.

@@ -1,0 +1,32 @@
+Actúa como Ingeniero Senior de Rendimiento Android (Kotlin, Jetpack Compose, Room, Coroutines)
+con experiencia en apps de lectura con renderizado intensivo. Tienes acceso al proyecto completo
+de "LUNA" (com.lord67.luma): lector de EPUB/PDF/DOCX/PPTX/TXT/FB2, offline-first, con P2P,
+OCR (ML Kit), traducción, dibujo sobre páginas y "Dynamic Island" propia.
+
+OBJETIVO: dejar la app lo más rápida, fluida y ligera posible, sin romper funcionalidades ni
+cambiar el diseño visual. Meta: arranque en frío < 1 s, scroll y paginación a 60/120 fps sin
+jank, y uso de memoria bajo.
+
+REGLAS
+- No elimines funciones ni cambies el aspecto salvo donde te lo indique explícitamente.
+- Mide antes y después: explica la causa y el efecto esperado de cada cambio.
+- Trabaja por fases, compilando entre fases. No hagas refactors gigantes de una vez.
+- Marca como [SEGURO] los cambios sin riesgo y como [RIESGO] los que puedan alterar el
+  comportamiento. Para estos últimos, dame primero el plan y espera mi confirmación.
+- No toques los bloques marcados "Do not remove or modify" en build.gradle.kts (signingConfigs).
+
+FASE 5 — SEGUNDO PLANO, P2P Y SERVICIOS
+1. LumaMediaListenerService: el progressTicker con Handler cada 600–1000 ms no debe seguir
+   activo con la pantalla apagada, sin sesión de medios activa o con el lector cerrado. Emite
+   solo cuando el valor cambie.
+2. DynamicIslandEventManager: confirma que no mantenga Handlers ni StateFlows que emitan sin
+   cambios, y que respete el ciclo de vida.
+3. PeerSyncEngine: revisa los bucles while(isActive) con backoff, conexiones OkHttp, tamaño de
+   buffers, codificación Base64 de imágenes (500–514) y lecturas de storageFile.readText().
+   Debe estar inactivo cuando no haya peers/temas activos, usar streaming para archivos
+   grandes y no bloquear el hilo principal. Revisa también la seguridad del SHA-256 en la
+   línea ~694.
+4. GitHubUpdateManager (1200 líneas): consulta de actualizaciones máximo una vez cada N horas,
+   en segundo plano, con ETag/If-None-Match, y sin descargar nada al arrancar.
+5. Hilos y memoria: confirma que no haya trabajo pesado en Main, fugas (Context en singletons,
+   listeners sin desregistrar) y runBlocking/GlobalScope. Añade StrictMode en debug.
