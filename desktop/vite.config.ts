@@ -6,8 +6,17 @@ export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
   server: {
-    port: 5173,
+    host: '0.0.0.0',
+    port: 3000,
     strictPort: true,
+    hmr: false,
+    allowedHosts: true,
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 3000,
+    strictPort: true,
+    allowedHosts: true,
   },
   build: {
     outDir: 'dist',

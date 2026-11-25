@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luma — Biblioteca Visual, Lector y Cuadernos</title>
     <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self' data: blob:; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://es.wikipedia.org https://en.wikipedia.org;"
+      name="description"
+      content="Versión de escritorio de Luma con interfaz estilo Notion y Canva: biblioteca multiformato, lector inmersivo, 17 temas suaves y estudio de cuadernos."
     />
-    <title>Luma — Lectura y Cuadernos para PC</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Lexend:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=JetBrains+Mono:wght@400;500;600&family=Lexend:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body class="antialiased selection:bg-blue-500/20">
+  <body class="overflow-hidden antialiased selection:bg-[var(--luma-accent-soft)] selection:text-[var(--luma-ink)]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

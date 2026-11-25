@@ -16,3 +16,7 @@
 local.properties
 .env
 debug.keystore
+/desktop/node_modules
+/desktop/dist
+/desktop/release
+

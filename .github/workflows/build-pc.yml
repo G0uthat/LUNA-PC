@@ -1,0 +1,63 @@
+name: Build Luma PC Executables
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/build-pc.yml'
+  workflow_dispatch:
+
+jobs:
+  build-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            script: dist:win
+            artifact_name: Luma-Windows-EXE
+            artifact_path: |
+              desktop/release/*.exe
+          - os: macos-latest
+            platform: mac
+            script: dist:mac
+            artifact_name: Luma-macOS-DMG
+            artifact_path: |
+              desktop/release/*.dmg
+          - os: ubuntu-latest
+            platform: linux
+            script: dist:linux
+            artifact_name: Luma-Linux-AppImage-DEB
+            artifact_path: |
+              desktop/release/*.AppImage
+              desktop/release/*.deb
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm install
+
+      - name: Build & Package ${{ matrix.platform }} Executable
+        working-directory: desktop
+        run: npm run ${{ matrix.script }}
+
+      - name: Upload PC Executable Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
