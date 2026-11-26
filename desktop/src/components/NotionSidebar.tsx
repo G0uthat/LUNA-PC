@@ -3,19 +3,30 @@ import {
   BookOpen,
   ChevronDown,
   ChevronRight,
+  Cloud,
   FolderKanban,
   Home,
   Library,
-  Palette,
   PenTool,
   Pin,
   Plus,
   Search,
+  Settings,
   Upload,
+  Users,
   X,
 } from 'lucide-react';
-import { LumaDocument, LumaNotebook, SagaPlaylist, WorkspaceTabKind } from '../types';
+import {
+  FriendPeer,
+  LumaDocument,
+  LumaNotebook,
+  SagaPlaylist,
+  UserProfile,
+  WorkspaceTabKind,
+} from '../types';
 import { ViewportProfile } from '../hooks/useViewportProfile';
+import { LumaBrandLogo } from './LumaBrandLogo';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NotionSidebarProps {
   viewport: ViewportProfile;
@@ -26,16 +37,22 @@ interface NotionSidebarProps {
   documents: LumaDocument[];
   playlists: SagaPlaylist[];
   notebooks: LumaNotebook[];
-  themeName: string;
+  profile: UserProfile;
+  friends: FriendPeer[];
+  sourcesCount?: number;
+  pendingSyncCount?: number;
   onCloseDrawer: () => void;
   onResizeWidth: (newWidth: number) => void;
-  onNavigate: (kind: 'home' | 'library' | 'sagas' | 'notebooks', sagaId?: string) => void;
+  onNavigate: (kind: 'home' | 'library' | 'sagas' | 'notebooks' | 'sources', sagaId?: string) => void;
   onOpenDocument: (docId: string) => void;
   onOpenNotebook: (nbId: string) => void;
   onImportFiles: () => void;
   onNewNotebook: () => void;
   onOpenCommandPalette: () => void;
-  onOpenAppearance: () => void;
+  onOpenProfile: () => void;
+  onOpenFriends: () => void;
+  onOpenSettings: () => void;
+  onOpenGuide: () => void;
 }
 
 export const NotionSidebar: React.FC<NotionSidebarProps> = ({
@@ -47,7 +64,10 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
   documents,
   playlists,
   notebooks,
-  themeName,
+  profile,
+  friends,
+  sourcesCount = 0,
+  pendingSyncCount = 0,
   onCloseDrawer,
   onResizeWidth,
   onNavigate,
@@ -56,11 +76,12 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
   onImportFiles,
   onNewNotebook,
   onOpenCommandPalette,
-  onOpenAppearance,
+  onOpenProfile,
+  onOpenFriends,
+  onOpenSettings,
+  onOpenGuide,
 }) => {
   const [pinnedExpanded, setPinnedExpanded] = useState(true);
-  const [sagasExpanded, setSagasExpanded] = useState(true);
-  const [notebooksExpanded, setNotebooksExpanded] = useState(true);
 
   const pinnedDocs = documents.filter((d) => d.pinned).slice(0, 5);
   const recentDocs =
@@ -68,8 +89,11 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
       ? pinnedDocs
       : [...documents].sort((a, b) => b.lastOpenedAt - a.lastOpenedAt).slice(0, 4);
 
-  const navItems: Array<{
-    kind: 'home' | 'library' | 'sagas' | 'notebooks';
+  const onlineFriendsCount = friends.filter((f) => f.isOnline).length;
+  const userInitial = (profile.username.trim()[0] || 'L').toUpperCase();
+
+  const navTabs: Array<{
+    kind: 'home' | 'library' | 'sagas' | 'notebooks' | 'sources';
     label: string;
     icon: React.ReactNode;
     count?: number;
@@ -82,26 +106,32 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
       count: documents.length,
     },
     {
+      kind: 'sagas',
+      label: 'Sagas',
+      icon: <FolderKanban className="w-4 h-4 shrink-0" />,
+      count: playlists.length,
+    },
+    {
       kind: 'notebooks',
       label: 'Cuadernos',
       icon: <PenTool className="w-4 h-4 shrink-0" />,
       count: notebooks.length,
     },
     {
-      kind: 'sagas',
-      label: 'Sagas y Listas',
-      icon: <FolderKanban className="w-4 h-4 shrink-0" />,
-      count: playlists.length,
+      kind: 'sources',
+      label: 'Fuentes (Drive)',
+      icon: <Cloud className="w-4 h-4 shrink-0" />,
+      count: pendingSyncCount > 0 ? pendingSyncCount : sourcesCount,
     },
   ];
 
-  // Compact tablet/split-screen icon rail when sidebar is collapsed or in rail mode
+  // Compact icon rail when sidebar is collapsed or on medium split-screen
   const showCompactRail =
     !open && (viewport.sidebarMode === 'rail' || viewport.sidebarMode === 'expanded');
 
   if (showCompactRail) {
     return (
-      <aside className="w-[56px] shrink-0 border-r bg-[var(--luma-sidebar)] flex flex-col items-center py-2.5 gap-1.5 select-none">
+      <aside className="w-[58px] shrink-0 border-r bg-[var(--luma-sidebar)] flex flex-col items-center py-2.5 gap-1.5 select-none">
         <button
           type="button"
           onClick={onOpenCommandPalette}
@@ -111,9 +141,9 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
           <Search className="w-4 h-4" />
         </button>
 
-        <div className="w-6 h-px bg-[var(--luma-border)] my-1" />
+        <div className="w-6 h-px bg-[var(--luma-border)] my-0.5" />
 
-        {navItems.map((item) => {
+        {navTabs.map((item) => {
           const isActive = activeNav === item.kind;
           return (
             <button
@@ -132,7 +162,7 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
           );
         })}
 
-        <div className="w-6 h-px bg-[var(--luma-border)] my-1" />
+        <div className="w-6 h-px bg-[var(--luma-border)] my-0.5" />
 
         <button
           type="button"
@@ -145,7 +175,7 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
         <button
           type="button"
           onClick={onNewNotebook}
-          title="Nuevo cuaderno"
+          title="Crear cuaderno, serie o importar"
           className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -153,13 +183,42 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
 
         <div className="flex-1" />
 
+        {/* Bottom mobile-Luma icons: Friends, Settings, Guide, User Profile */}
         <button
           type="button"
-          onClick={onOpenAppearance}
-          title={`Apariencia · ${themeName}`}
+          onClick={onOpenFriends}
+          title={`Amigos (${friends.length})`}
           className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] transition-colors"
         >
-          <Palette className="w-4 h-4" />
+          <Users className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          title="Configuración y Apariencia"
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] transition-colors"
+        >
+          <Settings className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onOpenGuide}
+          title="Guía · Cómo usar Luma"
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] transition-colors"
+        >
+          <BookOpen className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onOpenProfile}
+          title={`Cuenta · ${profile.username}`}
+          className="w-8 h-8 rounded-full overflow-hidden border border-[var(--luma-accent)] bg-[var(--luma-accent-soft)] text-[var(--luma-accent)] text-xs font-bold flex items-center justify-center mt-0.5"
+        >
+          {profile.avatarDataUrl ? (
+            <img src={profile.avatarDataUrl} alt={profile.username} className="w-full h-full object-cover" />
+          ) : (
+            userInitial
+          )}
         </button>
       </aside>
     );
@@ -193,14 +252,19 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
       style={{ width: isOverlayDrawer ? viewport.recommendedSidebarWidth : width }}
       className="relative h-full shrink-0 border-r bg-[var(--luma-sidebar)] text-[var(--luma-ink)] flex flex-col select-none"
     >
-      {/* Workspace Header */}
-      <div className="px-3 pt-3 pb-2 flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <div className="text-[13px] font-semibold truncate">Espacio Luma</div>
-          <div className="text-[11px] text-[var(--luma-ink-muted)] truncate">
-            {viewport.tierLabel}
-          </div>
-        </div>
+      {/* Top Luma Mobile-Style Brand Header (Logo + Calligraphic Signature) */}
+      <div className="px-3.5 pt-3.5 pb-2.5 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate('home');
+            if (isOverlayDrawer) onCloseDrawer();
+          }}
+          className="flex items-center min-w-0 hover:opacity-90 transition-opacity"
+        >
+          <LumaBrandLogo size="md" />
+        </button>
+
         {isOverlayDrawer && (
           <button
             type="button"
@@ -213,8 +277,8 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
         )}
       </div>
 
-      {/* Quick Search Bar */}
-      <div className="px-2.5 pb-2">
+      {/* Quick Command Search */}
+      <div className="px-2.5 pb-2.5">
         <button
           type="button"
           onClick={onOpenCommandPalette}
@@ -222,17 +286,17 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
         >
           <span className="flex items-center gap-2 truncate">
             <Search className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Buscar en Luma...</span>
+            <span className="truncate">Ir a...</span>
           </span>
           <span className="font-mono text-[10px] opacity-75 shrink-0">Ctrl+K</span>
         </button>
       </div>
 
-      {/* Scrollable Navigation Sections */}
+      {/* Main Non-Repetitive Navigation + Quick Actions + Pinned */}
       <div className="flex-1 overflow-y-auto px-2 py-1 space-y-4">
-        {/* Primary Nav */}
-        <nav className="space-y-0.5">
-          {navItems.map((item) => {
+        {/* Single clean Workspace Tabs (No duplicated Cuadernos/Sagas trees below!) */}
+        <nav className="space-y-0.5" aria-label="Navegación principal">
+          {navTabs.map((item) => {
             const isActive = activeNav === item.kind;
             return (
               <button
@@ -242,7 +306,7 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
                   onNavigate(item.kind);
                   if (isOverlayDrawer) onCloseDrawer();
                 }}
-                className={`w-full h-8 px-2.5 rounded-lg flex items-center justify-between text-[13px] transition-colors ${
+                className={`w-full h-8.5 px-2.5 rounded-lg flex items-center justify-between text-[13px] transition-colors ${
                   isActive
                     ? 'bg-[var(--luma-accent-soft)] text-[var(--luma-accent)] font-semibold'
                     : 'text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] font-medium'
@@ -262,7 +326,7 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
           })}
         </nav>
 
-        {/* Quick Actions */}
+        {/* Primary Quick Actions */}
         <div className="grid grid-cols-2 gap-1.5 px-0.5">
           <button
             type="button"
@@ -284,11 +348,11 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
             className="h-8 px-2 rounded-lg bg-[var(--luma-accent)] text-[var(--luma-on-accent)] hover:opacity-95 flex items-center justify-center gap-1.5 text-xs font-semibold transition-opacity whitespace-nowrap"
           >
             <Plus className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Cuaderno</span>
+            <span className="truncate">Crear</span>
           </button>
         </div>
 
-        {/* Pinned / Recent Reading */}
+        {/* Pinned / Active Reading Shortcuts (no redundant Sagas/Cuadernos repeat) */}
         <div>
           <button
             type="button"
@@ -329,37 +393,8 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
                   </button>
                 );
               })}
-            </div>
-          )}
-        </div>
 
-        {/* Notebooks Tree */}
-        <div>
-          <div className="flex items-center justify-between px-1.5 py-1">
-            <button
-              type="button"
-              onClick={() => setNotebooksExpanded((v) => !v)}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)]"
-            >
-              {notebooksExpanded ? (
-                <ChevronDown className="w-3 h-3" />
-              ) : (
-                <ChevronRight className="w-3 h-3" />
-              )}
-              <span>Cuadernos</span>
-            </button>
-            <button
-              type="button"
-              onClick={onNewNotebook}
-              title="Crear cuaderno"
-              className="p-0.5 rounded hover:bg-[var(--luma-surface-alt)] text-[var(--luma-ink-muted)]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          {notebooksExpanded && (
-            <div className="mt-0.5 space-y-0.5">
-              {notebooks.map((nb) => {
+              {notebooks.filter((n) => n.pinned).slice(0, 2).map((nb) => {
                 const isSelected = activeNav === 'studio' && activeTargetId === nb.id;
                 return (
                   <button
@@ -375,68 +410,89 @@ export const NotionSidebar: React.FC<NotionSidebarProps> = ({
                         : 'text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)]'
                     }`}
                   >
-                    <PenTool className="w-3.5 h-3.5 shrink-0" style={{ color: nb.coverColor }} />
+                    <PenTool className="w-3 h-3 shrink-0" style={{ color: nb.coverColor }} />
                     <span className="truncate flex-1 text-left">{nb.title}</span>
-                    <span className="text-[10px] tabular-nums opacity-65">{nb.pages.length}p</span>
+                    <Pin className="w-3 h-3 opacity-50 shrink-0" />
                   </button>
                 );
               })}
             </div>
           )}
         </div>
-
-        {/* Sagas / Playlists Tree */}
-        <div>
-          <button
-            type="button"
-            onClick={() => setSagasExpanded((v) => !v)}
-            className="w-full px-1.5 py-1 flex items-center gap-1 text-[11px] font-semibold text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)]"
-          >
-            {sagasExpanded ? (
-              <ChevronDown className="w-3 h-3" />
-            ) : (
-              <ChevronRight className="w-3 h-3" />
-            )}
-            <span>Sagas y Listas</span>
-          </button>
-          {sagasExpanded && (
-            <div className="mt-0.5 space-y-0.5">
-              {playlists.map((pl) => (
-                <button
-                  key={pl.id}
-                  type="button"
-                  onClick={() => {
-                    onNavigate('sagas', pl.id);
-                    if (isOverlayDrawer) onCloseDrawer();
-                  }}
-                  className="w-full h-8 px-2 rounded-lg flex items-center gap-2 text-xs text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] transition-colors"
-                >
-                  <BookOpen className="w-3.5 h-3.5 shrink-0" style={{ color: pl.accentColor }} />
-                  <span className="truncate flex-1 text-left">{pl.name}</span>
-                  <span className="text-[10px] tabular-nums opacity-65">
-                    {pl.documentIds.length}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Bottom Appearance Footer */}
-      <div className="p-2 border-t border-[var(--luma-border)]">
+      {/* Bottom Mobile-Luma Style Dock: PWA Install + Clean 3-button strip (Amigos, Ajustes, Guía) + Profile Row */}
+      <div className="p-2 border-t border-[var(--luma-border)] space-y-2">
+        <PWAInstallButton compact className="w-full" />
+        <div className="grid grid-cols-3 gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              onOpenFriends();
+              if (isOverlayDrawer) onCloseDrawer();
+            }}
+            title={`Amigos (${onlineFriendsCount} en línea)`}
+            className="py-1.5 px-1 rounded-lg hover:bg-[var(--luma-surface-alt)] flex flex-col items-center justify-center gap-0.5 text-[11px] text-[var(--luma-ink)] transition-colors"
+          >
+            <Users className="w-4 h-4 text-[var(--luma-ink-muted)]" />
+            <span className="font-medium truncate">Amigos</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              onOpenSettings();
+              if (isOverlayDrawer) onCloseDrawer();
+            }}
+            title="Configuración y Apariencia"
+            className="py-1.5 px-1 rounded-lg hover:bg-[var(--luma-surface-alt)] flex flex-col items-center justify-center gap-0.5 text-[11px] text-[var(--luma-ink)] transition-colors"
+          >
+            <Settings className="w-4 h-4 text-[var(--luma-ink-muted)]" />
+            <span className="font-medium truncate">Ajustes</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              onOpenGuide();
+              if (isOverlayDrawer) onCloseDrawer();
+            }}
+            title="Guía · Cómo usar Luma"
+            className="py-1.5 px-1 rounded-lg hover:bg-[var(--luma-surface-alt)] flex flex-col items-center justify-center gap-0.5 text-[11px] text-[var(--luma-ink)] transition-colors"
+          >
+            <BookOpen className="w-4 h-4 text-[var(--luma-ink-muted)]" />
+            <span className="font-medium truncate">Guía</span>
+          </button>
+        </div>
+
+        {/* User Profile Row */}
         <button
           type="button"
-          onClick={onOpenAppearance}
-          className="w-full h-9 px-2.5 rounded-lg hover:bg-[var(--luma-surface-alt)] flex items-center justify-between text-xs transition-colors"
+          onClick={() => {
+            onOpenProfile();
+            if (isOverlayDrawer) onCloseDrawer();
+          }}
+          className="w-full p-2 rounded-xl border border-[var(--luma-border)] bg-[var(--luma-surface)] hover:bg-[var(--luma-surface-alt)] flex items-center gap-2.5 text-left transition-colors"
         >
-          <span className="flex items-center gap-2 min-w-0">
-            <Palette className="w-4 h-4 text-[var(--luma-accent)] shrink-0" />
-            <span className="truncate font-medium text-[var(--luma-ink)]">Apariencia</span>
-          </span>
-          <span className="text-[11px] text-[var(--luma-ink-muted)] truncate max-w-[96px]">
-            {themeName}
-          </span>
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-[var(--luma-accent)]/60 bg-[var(--luma-accent-soft)] text-[var(--luma-accent)] text-xs font-bold flex items-center justify-center shrink-0">
+            {profile.avatarDataUrl ? (
+              <img
+                src={profile.avatarDataUrl}
+                alt={profile.username}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              userInitial
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs font-semibold truncate text-[var(--luma-ink)]">
+              {profile.username || 'Lector Luma'}
+            </div>
+            <div className="text-[10px] font-mono text-[var(--luma-ink-muted)] truncate">
+              {profile.peerCode} · Cuenta
+            </div>
+          </div>
         </button>
       </div>
 

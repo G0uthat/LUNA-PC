@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   BookOpen,
+  Cloud,
   Columns2,
   FolderKanban,
   Home,
@@ -17,6 +18,8 @@ import {
 } from 'lucide-react';
 import { WorkspaceTab } from '../types';
 import { ViewportProfile } from '../hooks/useViewportProfile';
+import { LumaBrandLogo } from './LumaBrandLogo';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface TitlebarAndTabsProps {
   tabs: WorkspaceTab[];
@@ -67,6 +70,8 @@ export const TitlebarAndTabs: React.FC<TitlebarAndTabsProps> = ({
       case 'notebooks':
       case 'studio':
         return <PenTool className="w-3.5 h-3.5 shrink-0" />;
+      case 'sources':
+        return <Cloud className="w-3.5 h-3.5 shrink-0" />;
       case 'reader':
         return <BookOpen className="w-3.5 h-3.5 shrink-0" />;
     }
@@ -92,10 +97,10 @@ export const TitlebarAndTabs: React.FC<TitlebarAndTabsProps> = ({
           <PanelLeft className="w-4 h-4" />
         </button>
 
-        {viewport.tier !== 'compact' && (
-          <span className="text-[13px] font-bold tracking-tight text-[var(--luma-ink)] px-1 whitespace-nowrap shrink-0">
-            Luma
-          </span>
+        {!sidebarOpen && viewport.tier !== 'compact' && (
+          <div className="px-1 shrink-0">
+            <LumaBrandLogo size="sm" />
+          </div>
         )}
       </div>
 
@@ -142,15 +147,16 @@ export const TitlebarAndTabs: React.FC<TitlebarAndTabsProps> = ({
         <button
           type="button"
           onClick={onNewNotebook}
-          title="Nuevo cuaderno rápido"
+          title="Crear cuaderno, serie o importar"
           className="h-7 w-7 flex items-center justify-center rounded-md text-[var(--luma-ink-muted)] hover:text-[var(--luma-ink)] hover:bg-[var(--luma-surface-alt)] transition-colors shrink-0"
         >
           <Plus className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Right: Quick search, Split View, Focus mode, and OS window controls */}
+      {/* Right: PWA Install, Quick search, Split View, Focus mode, and OS window controls */}
       <div className="electron-no-drag flex items-center gap-1 shrink-0">
+        {viewport.tier !== 'compact' && <PWAInstallButton compact />}
         <button
           type="button"
           onClick={onOpenCommandPalette}
@@ -182,7 +188,7 @@ export const TitlebarAndTabs: React.FC<TitlebarAndTabsProps> = ({
         <button
           type="button"
           onClick={onToggleZen}
-          title={isZenMode ? 'Salir de modo enfoque' : 'Modo enfoque sin distracciones'}
+          title={isZenMode ? 'Salir de pantalla completa (ESC)' : 'Pantalla completa inmersiva (F11)'}
           className={`h-7 w-7 flex items-center justify-center rounded-md transition-colors ${
             isZenMode
               ? 'bg-[var(--luma-accent-soft)] text-[var(--luma-accent)]'

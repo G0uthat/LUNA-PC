@@ -22,6 +22,8 @@
   "dependencies": {
     "jszip": "^3.10.1",
     "lucide-react": "^0.511.0",
+    "mammoth": "^1.13.0",
+    "pdfjs-dist": "^6.5.438",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
@@ -36,6 +38,7 @@
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3",
     "vite": "^6.3.2",
+    "vite-plugin-pwa": "^2.0.0",
     "wait-on": "^8.0.3"
   },
   "build": {
@@ -55,11 +58,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "Luma-${version}-${target}.${ext}",
@@ -75,13 +82,18 @@
     },
     "mac": {
       "category": "public.app-category.productivity",
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "artifactName": "Luma-${version}-mac.${ext}",
       "icon": "build-resources/icon.png"
     },
     "linux": {
       "category": "Education;Office",
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "artifactName": "Luma-${version}-linux.${ext}",
       "icon": "build-resources/icon.png"
     }
